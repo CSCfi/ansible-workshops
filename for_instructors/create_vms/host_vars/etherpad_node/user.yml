@@ -1,0 +1,7 @@
+---
+  #  http://docs.ansible.com/ansible/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module
+  # ansible-role-users does not support setting passwords
+adminusers:
+  - {name: ansible1, state: 'present', uid: 5003, group: "{{admingroup}}", shell: "{{adminshell}}", password: "crypt" }
+
+...
