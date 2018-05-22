@@ -1,0 +1,5 @@
+---
+- src: https://github.com/CSCfi/ansible-role-users
+  scm: git
+  path: roles
+...

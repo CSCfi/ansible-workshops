@@ -1,0 +1,5 @@
+---
+- hosts: etherpad
+  become: yes
+  roles:
+    - ansible-role-users

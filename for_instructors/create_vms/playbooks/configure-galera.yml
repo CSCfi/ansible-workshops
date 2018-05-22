@@ -1,0 +1,8 @@
+---
+- hosts: etherpad
+  gather_facts: yes
+
+- hosts: galera
+  become: yes
+  roles:
+    - ansible-role-users
