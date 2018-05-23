@@ -1,2 +1,3 @@
 my-heat-params.yml
 roles/ansible-role-*
+vault.yml
