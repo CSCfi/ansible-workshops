@@ -1,0 +1,29 @@
+---
+- name: Configure chrony for NTP on the node
+  hosts: pouta
+  remote_user: cloud-user
+  become: true
+
+  tasks:
+    - name: Ensure the NTP package is absent, conflicts with chrony
+      package:
+        name: ntp
+        state: absent
+
+    - name: Ensure Chrony is installed
+      yum:
+        name: chrony
+        state: present
+  
+    - name: Configure chrony daemon conf
+      template:
+        src: templates/chrony.conf.j2
+        dest: /etc/chrony.conf
+      notify: restart-chrony
+
+  handlers:
+    - name: restart-chrony
+      service:
+        name: chronyd
+        state: restarted
+        enabled: yes

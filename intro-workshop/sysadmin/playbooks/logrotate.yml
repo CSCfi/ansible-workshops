@@ -1,0 +1,11 @@
+---
+
+- hosts: pouta # Add your pouta ip to the hosts file once you know it
+  remote_user: cloud-user
+  become: true
+ 
+  tasks:
+  - name: Configure logrotate for syslog
+    template:
+      src: templates/logrotate.j2
+      dest: /etc/logrotate.d/syslog

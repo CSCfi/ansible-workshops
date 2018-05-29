@@ -1,0 +1,19 @@
+---
+- name: Add a new user account to your node
+  hosts: pouta
+  remote_user: cloud-user
+  become: yes
+  tasks:
+    - name: Add group for new user, cloud-user2
+      group:
+        name: cloud-user2
+        state: present
+
+    - name: Add user cloud-user2
+      user:
+        name: cloud-user2
+        state: present
+        groups: cloud-user2,wheel
+        generate_ssh_key: yes
+        ssh_key_bits: 4096
+        ssh_key_file: .ssh/id_rsa
