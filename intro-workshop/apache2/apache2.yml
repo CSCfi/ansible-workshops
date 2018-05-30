@@ -1,6 +1,6 @@
 - name: Install Apache 2 host and setup start page
-  hosts: new    # fill this here
-  remote_user: cloud-user
+  hosts: all    # fill this here
+  remote_user: madeira
   become: yes  # sudo to root
   vars:
     demo_photo: csc_logo.jpg
