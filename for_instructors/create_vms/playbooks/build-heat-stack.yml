@@ -70,3 +70,20 @@
         port: 22
         state: started
       delegate_to: etherpad_node
+
+- hosts: galera
+  gather_facts: yes
+  tags: dns
+  user: cloud-user
+
+- hosts: etherpad
+  gather_facts: yes
+  tags: dns
+  user: cloud-user
+  become: yes
+  vars:
+    - hosts_ip_source: "template"
+    - hosts_file_to_populate: /etc/hosts
+    - ipaddress_source_var: ansible_ssh_host
+  roles: 
+    - ansible-role-hosts-inventory

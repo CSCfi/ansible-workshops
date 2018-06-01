@@ -18,8 +18,12 @@ from passlib.hash import sha512_crypt # pylint: disable=import-error
 N = 6
 USERS = 15
 
+BASEUID = 10000
+
 print "moreusers:"
 for user in range(0, USERS):
+
+    useruid = BASEUID + user
 
     password = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(N))
 
@@ -27,4 +31,4 @@ for user in range(0, USERS):
 
     #print "%s: %s" %(password, encrypted)
     # print in ansible format..
-    print " - {name: ansible%s, state: 'present', uid: 5003, group: '{{admingroup}}', shell: '{{adminshell}}', password: '%s' } # %s" %(user, encrypted, password) # pylint: disable=line-too-long
+    print " - {name: ansible%s, state: 'present', uid: %s, group: 'ansibleusers', shell: '{{adminshell}}', password: '%s', generate_ssh_key: 'yes' } # %s" %(user, useruid, encrypted, password) # pylint: disable=line-too-long

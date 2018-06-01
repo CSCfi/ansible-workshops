@@ -1,3 +1,4 @@
 ---
 vm_user_account: "cloud-user"
 etherpad_network_name: "project_2000745"
+bootstrap_user: "cloud-user"

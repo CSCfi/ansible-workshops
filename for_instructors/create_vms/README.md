@@ -107,6 +107,11 @@ Edit the file with your favorite editor and fill in all the variables. You can
 find documentation about the variables in the Heat template under
 `files/etherpad-heat-stack.yml`.
 
+Creating the controlmaster socket:
+```bash
+$ mkdir ~/.ssh/cm_socket/
+```
+
 Once you have completed the steps above, you are ready to spin up the stack in
 OpenStack. You will need to specify the name of the network you filled in in
 your Heat parameters:

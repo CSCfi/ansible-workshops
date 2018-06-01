@@ -1,5 +1,7 @@
 ---
 - hosts: etherpad
   become: yes
+  user: cloud-user
   roles:
+    - ansible-role-sshd
     - ansible-role-users

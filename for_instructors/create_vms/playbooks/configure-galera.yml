@@ -1,8 +1,78 @@
 ---
 - hosts: etherpad
   gather_facts: yes
+  user: cloud-user
 
 - hosts: galera
   become: yes
+  user: cloud-user
   roles:
     - ansible-role-users
+
+#########
+#
+ # at this point we have all the ansible0-ansible15 users on etherpad_node
+ # we also have one user in each galera_node
+ # now we want to get the ssh-key added for each user
+ # for i in $(seq 0 15); do echo user $i; echo ssh galera_node$i sudo mkdir /home/ansible1/.ssh; echo ssh galera_node$i sudo chown -v ansible1 /home/ansible1/.ssh; echo sudo cp /home/ansible$i/.ssh/id_rsa.pub /tmp/authorized_key; echo scp /tmp/authorized_key galera_node$i:/tmp/authorized_keys; echo ssh galera_node$i sudo mv -v /tmp/authorized_keys /home/ansible1/.ssh/; echo ssh galera_node$i sudo chown ansible1 /home/ansible1/.ssh/authorized_keys; echo ssh galera_node$i sudo chmod 600 /home/ansible1/.ssh/authorized_keys; done
+ ####
+  for i in $(seq 0 15); do \
+   echo user $i; \
+   echo ssh galera_node$i sudo mkdir /home/ansible1/.ssh; \
+   echo ssh galera_node$i sudo chown -v ansible1 /home/ansible1/.ssh; \
+   echo sudo cp /home/ansible$i/.ssh/id_rsa.pub /tmp/authorized_key; \
+   echo scp /tmp/authorized_key galera_node$i:/tmp/authorized_keys; \
+   echo ssh galera_node$i sudo mv -v /tmp/authorized_keys /home/ansible1/.ssh/; \
+   echo ssh galera_node$i sudo chown ansible1 /home/ansible1/.ssh/authorized_keys; \
+   echo ssh galera_node$i sudo chmod 600 /home/ansible1/.ssh/authorized_keys; \
+   done
+ #
+ #
+ # ### OR the same in ansible??
+
+- hosts: etherpad
+  gather_facts: yes
+  user: cloud-user
+  vars:
+    - adminshell: "/bin/bash"
+  tasks:
+    - name: create a dict of all the users and their ssh pubkeys
+      command: "cat /home/{{ item.name }}/.ssh/id_rsa.pub"
+      register: reg_user_ssh_keys
+      with_items: "{{ moreusers }}"
+      become: yes
+      become_user: "{{ item.name }}"
+    - name: print the registered var
+      debug: 
+        var: reg_user_ssh_keys
+        verbosity: 2
+    - name: create a fact for this
+      set_fact: 
+        fact_ssh_keys: "{{ reg_user_ssh_keys }}"
+    - name: print the fact local to this host
+      debug:
+        var: fact_ssh_keys
+        verbosity: 2
+
+- hosts: galera
+  gather_facts: yes
+  user: cloud-user
+  vars:
+    - adminshell: "/bin/bash"
+  tasks:
+    - name: print the var from etherpad_node hostvars
+      debug:
+        var: hostvars["etherpad_node"]["fact_ssh_keys"]
+        verbosity: 2
+    - name: mkdir each users .ssh
+      file:
+        path: "/home/{{ item.name }}/.ssh"
+        state: directory
+        mode: "0700"
+      become: yes
+      become_user: "{{ item.name }}"
+      with_items: "{{ hostvars['etherpad_node']['moreusers'] }}"
+#    - name: create the authorized_keys file
+
+
+

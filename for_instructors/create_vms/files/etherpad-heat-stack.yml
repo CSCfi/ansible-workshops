@@ -81,6 +81,10 @@ resources:
       networks:
         - network: { get_param: etherpad_network }
       metadata: { 'ansible_group': 'etherpad' }
+      user_data: |
+        #!/bin/bash
+        setenforce 0
+        sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/sysconfig/selinux
 
   etherpad_floating_ip_association:
     type: OS::Nova::FloatingIPAssociation
@@ -104,6 +108,10 @@ resources:
           networks:
             - network: { get_param: etherpad_network }
           metadata: { 'ansible_group': 'galera' }
+          user_data: |
+            #!/bin/bash
+            setenforce 0
+            sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/sysconfig/selinux
 
 outputs:
   etherpad_node:
