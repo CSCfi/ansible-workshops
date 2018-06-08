@@ -71,11 +71,6 @@
         state: started
       delegate_to: etherpad_node
 
-- hosts: galera
-  gather_facts: yes
-  tags: dns
-  user: cloud-user
-
 - hosts: etherpad
   gather_facts: yes
   tags: dns

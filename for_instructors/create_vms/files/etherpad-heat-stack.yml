@@ -95,7 +95,7 @@ resources:
   galera_nodes:
     type: OS::Heat::ResourceGroup
     properties:
-      count: 3
+      count: 4
       resource_def:
         type: OS::Nova::Server
         properties:

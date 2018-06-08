@@ -139,7 +139,7 @@ pointing your browser to its public IP address.
 ```bash
 $  for i in $(seq 0 3); do \
      echo "## user $i"; \
-     echo ssh galera_node$i sudo adduser ansibleworkshop; \
+     echo ssh galera_node$i sudo adduser ansibleworkshop -G ansibleusers; \
      echo ssh galera_node$i sudo mkdir -v /home/ansibleworkshop/.ssh; \
      echo ssh galera_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh; \
      echo sudo cp -v /home/ansible$i/.ssh/id_rsa.pub /tmp/authorized_key; \
