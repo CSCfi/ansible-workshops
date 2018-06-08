@@ -1,6 +1,0 @@
----
-
-moreusers:
-    - {name: ansible1, state: 'present', uid: 5003, group: "{{admingroup}}", shell: "{{adminshell}}", pubkey: "ssh-rsa KEY rsync1@example.com" }
-
-...
