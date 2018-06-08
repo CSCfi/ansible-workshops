@@ -1,0 +1,15 @@
+---
+  #  http://docs.ansible.com/ansible/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module
+  # ansible-role-users does not support setting passwords
+  # This is an example file. Use the create_passwords.py in this repo to create a vault.yml file
+adminusers:
+  - {name: jguldmyr, state: 'present', uid: 5003, group: "{{admingroup}}", shell: "{{adminshell}}", pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMjxSXb6zjshfFDvcgcdPjWHnHoDFqIunBMEtJIV234N jguldmyr" }
+  - {name: joao, state: 'present', uid: 5004, group: "{{admingroup}}", shell: "{{adminshell}}", pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMjxSXb6zjshfFDvcgcdPjWHnHoDFqIunBMEtJIV234N jguldmyr" }
+  - {name: juho, state: 'present', uid: 5005, group: "{{admingroup}}", shell: "{{adminshell}}", pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMjxSXb6zjshfFDvcgcdPjWHnHoDFqIunBMEtJIV234N jguldmyr" }
+  - {name: martin, state: 'present', uid: 5006, group: "{{admingroup}}", shell: "{{adminshell}}", pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMjxSXb6zjshfFDvcgcdPjWHnHoDFqIunBMEtJIV234N jguldmyr" }
+
+admin_list_of_groups:
+  - { name: ansibleusers, gid: 27001 }
+
+
+...
