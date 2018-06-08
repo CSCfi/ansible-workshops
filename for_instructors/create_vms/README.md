@@ -137,14 +137,14 @@ Once the playbook run finishes, you can access the deployed application by
 pointing your browser to its public IP address.
 
 ```bash
-$  for i in $(seq 0 15); do \
-     echo user $i; \
+$  for i in $(seq 0 3); do \
+     echo "## user $i"; \
      echo ssh galera_node$i sudo adduser ansibleworkshop; \
      echo ssh galera_node$i sudo mkdir -v /home/ansibleworkshop/.ssh; \
-     echo ssh galera_node$i sudo chown -v ansible1 /home/ansibleworkshop/.ssh; \
+     echo ssh galera_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh; \
      echo sudo cp -v /home/ansible$i/.ssh/id_rsa.pub /tmp/authorized_key; \
      echo scp /tmp/authorized_key galera_node$i:/tmp/authorized_keys; \
-     echo ssh galera_node$i sudo cp -v /home/ansibleworkshop/.ssh/authorized_keys /root/.ssh/authorized_keys; \
+     echo ssh galera_node$i sudo cp -v /home/cloud-user/.ssh/authorized_keys /root/.ssh/authorized_keys; \
      echo ssh galera_node$i sudo mv -v /tmp/authorized_keys /home/ansibleworkshop/.ssh/; \
      echo ssh root@galera_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh/authorized_keys; \
      echo ssh root@galera_node$i sudo chmod -v 600 /home/ansibleworkshop/.ssh/authorized_keys; \

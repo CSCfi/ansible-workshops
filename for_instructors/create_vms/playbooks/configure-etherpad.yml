@@ -5,3 +5,10 @@
   roles:
     - ansible-role-sshd
     - ansible-role-users
+  tasks:
+    - name: configure a personalized motd
+      template:
+        src: motd.j2
+        dest: /etc/profile.d/workshop-motd.sh
+        mode: 0644
+            
