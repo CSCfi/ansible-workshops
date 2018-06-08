@@ -1,3 +1,6 @@
 my-heat-params.yml
 roles/ansible-role-*
 vault.yml
+todo
+etherpad_inventory
+playbooks/*.unfinished
