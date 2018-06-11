@@ -18,7 +18,7 @@
         * Apache Hello World (or Nginx Hello World as alternative)
         * Sys Admin Tasks (e.g chrony)
         * Infra Admin Tasks
-    * And a reference to Ansible use in Taito
+    * And a reference to Ansible use in Taito. See [servers/taito in Kielipankki-palvelut](https://github.com/CSCfi/Kielipankki-palvelut/tree/master/servers/taito "The taito software stack of the Language Bank")
 
 And why not continuing the Apache thread by a ops_playbook to for example update apache on all the nodes or why not how to add the oh-so important [ http://www.gnuterrypratchett.com/#apache | http://www.gnuterrypratchett.com/#apache ]
 
