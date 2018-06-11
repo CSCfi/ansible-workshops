@@ -1,0 +1,16 @@
+*.cert                                                                                                                                                                                                             
+*.key
+*.req
+*.ca
+*.pem
+*.tgz
+*.bin
+*.swp
+*.swo
+*.bin
+*.retry
+*.idea
+*.pyc
+.DS_Store
+credentials/
+roles/

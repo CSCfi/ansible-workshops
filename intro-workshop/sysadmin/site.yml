@@ -1,0 +1,24 @@
+---
+# https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html
+# Now we can add 1 or more plays to the playbook
+# For site.yml we can call other playbooks to separate out configuration
+# Plays, like tasks, run in the order specified in the playbook: top to bottom.
+# For playbook directory layouts
+# https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html
+# https://leucos.github.io/ansible-files-layout
+
+- name: Configure User accounts on the host
+  import_playbook: playbooks/accounts.yml
+  tags: accounts
+
+- name: Configure Chrony for NTP on the host
+  import_playbook: playbooks/chrony.yml
+  tags: time
+
+- name: Configure Logrorate on the host
+  import_playbook: playbooks/logrotate.yml
+  tags: logrotate
+
+- name: Configure SSH on the host
+  import_playbook: playbooks/ssh.yml
+  tags: ssh-conf
