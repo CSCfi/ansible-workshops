@@ -137,6 +137,14 @@ Once the playbook run finishes, you can access the deployed application by
 pointing your browser to its public IP address.
 
 ```bash
+$ # the following help if one rebuilds the nodes (don't run every time..):
+$ # rm ~/.ssh/known_hosts
+$ # rm -v /home/ansible*/.ssh/known_hosts # in case you need to cleanup users
+$ # echo "Host *" >> ~/.ssh/config
+$ # echo "StrictHostKeyChecking no" >> ~/.ssh/config
+$ # echo "UserKnownHostsFile /dev/null" >> ~/.ssh/config
+$ # chmod 600 ~/.ssh/config
+$ # add a user, add the user's ssh key to it
 $  for i in $(seq 0 3); do \
      echo "## user $i"; \
      echo ssh galera_node$i sudo adduser ansibleworkshop -G ansibleusers; \
@@ -146,6 +154,7 @@ $  for i in $(seq 0 3); do \
      echo scp /tmp/authorized_key galera_node$i:/tmp/authorized_keys; \
      echo ssh galera_node$i sudo cp -v /home/cloud-user/.ssh/authorized_keys /root/.ssh/authorized_keys; \
      echo ssh galera_node$i sudo mv -v /tmp/authorized_keys /home/ansibleworkshop/.ssh/; \
+     echo ssh galera_node$i sudo rm /home/ansibleworkshop/.ssh/known_hosts; \
      echo ssh root@galera_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh/authorized_keys; \
      echo ssh root@galera_node$i sudo chmod -v 600 /home/ansibleworkshop/.ssh/authorized_keys; \
      done
