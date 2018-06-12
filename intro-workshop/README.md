@@ -30,3 +30,16 @@ And why not continuing the Apache thread by a ops_playbook to for example update
 5. Start and stop services
 6. Set environment variables
 7. Experience in writing scripts (any language) is a plus
+
+## Getting Started with the Exercises
+1. apache2: this is the simplest exercise, the inventory is in one playbook (`apache2.yml.`). Give a value to `hosts` (replace `<your_remote_host>` with the remote host's IP) and get it running with `ansible-playbook apache2.yml`.
+
+2. `sysadmin`: several sysadmin playbooks under `/sysadmin/playbooks`:
+
+  2.1 Configure User accounts on the host
+
+  2.2 Configure Chrony for NTP on the host
+
+  2.3. Configure Logrotate on the host
+
+  2.4 Configure SSH on the host

@@ -1,10 +1,10 @@
 - name: Install Apache 2 host and setup start page
-  hosts: all    # fill this here
-  remote_user: <your_sudo_user>
-  become: yes  # sudo to root
+  hosts: <your_remote_host>    # fill this here
+  remote_user: <your_remote_sudo_user> # fill this here
+  become: yes 
   vars:
     demo_photo: csc_logo.jpg
-    demo_greeting: "CSC - IT Center for Science"
+    demo_greeting: "CSC - IT Center for Science" # you can change the greeting if you like :-)
 
 
 
