@@ -13,24 +13,8 @@
         dest: /etc/profile.d/ssh-agent-bashprofile.sh
         mode: 0644
         owner: root
-    - name: now manually run a for loop from the bastion
+    - name: now manually run a for loop from the bastion (PRs accepted to improve this)
       pause: 
         prompt: "Read README.md and run the for loop to for example copy the pub keys to the users"
   roles:
     - ansible-role-users
-
-  # then login to the etherpad node and run this:
-  # # this is also in README file
-  #for i in $(seq 0 15); do \
-  # echo user $i; \
-  # echo ssh galera_node$i sudo mkdir -v /home/cloud-user/.ssh; \
-  # echo ssh galera_node$i sudo chown -v ansible1 /home/cloud-user/.ssh; \
-  # echo sudo cp -v /home/ansible$i/.ssh/id_rsa.pub /tmp/authorized_key; \
-  # echo scp /tmp/authorized_key galera_node$i:/tmp/authorized_keys; \
-  # echo ssh galera_node$i sudo cp -v /home/cloud-user/.ssh/authorized_keys /root/.ssh/authorized_keys; \
-  # echo ssh galera_node$i sudo mv -v /tmp/authorized_keys /home/cloud-user/.ssh/; \
-  # echo ssh root@galera_node$i sudo chown -v cloud-user /home/cloud-user/.ssh/authorized_keys; \
-  # echo ssh root@galera_node$i sudo chmod -v 600 /home/cloud-user/.ssh/authorized_keys; \
-  # done
-
-
