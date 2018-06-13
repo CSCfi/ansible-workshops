@@ -1,6 +1,6 @@
 - name: Install Apache 2 host and setup start page
-  hosts: <your_remote_host>    # fill this here
-  remote_user: <your_remote_sudo_user> # fill this here
+  hosts: testhost    # fill this here
+  remote_user: ansibleworkshop # fill this here
   become: yes 
   vars:
     demo_photo: csc_logo.jpg
