@@ -209,7 +209,13 @@ if you want to use this repo as an example you should be aware of the following
 caveats. First of all a caveat about this list: it is almost certainly not
 complete, and there are other things that could be done better as there always
 are. As a general principle, you should not copy implementation details from an
-example without understanding the implications.
+example without understanding the implications. PRs are welcome.
+
+ - passwords in capitals and numbers of only 6 chars are insecure
+ - ssh-keys without passwords should not to be used
+ - running ssh-agents on a bastion host should be analyzed
+ - to reduce possibility of ssh MITM attacks do use the ssh known_hosts
+ - selinux should not be disabled
 
 ## Contributors
 
