@@ -31,15 +31,33 @@ And why not continuing the Apache thread by a ops_playbook to for example update
 6. Set environment variables
 7. Experience in writing scripts (any language) is a plus
 
+## Reading materials
+
+http://docs.ansible.com/
+
 ## Getting Started with the Exercises
+0. Installing ansible after sshing in to the bastion host
+
 1. apache2: this is the simplest exercise, the inventory is in one playbook (`apache2.yml.`). Give a value to `hosts` (replace `<your_remote_host>` with the remote host's IP) and get it running with `ansible-playbook apache2.yml`.
 
 2. `sysadmin`: several sysadmin playbooks under `/sysadmin/playbooks`:
 
   2.1 Configure User accounts on the host
 
+     1 Add another user
+     2 Add your user's ssh public key to the authorized_keys file for a new user
+
   2.2 Configure Chrony for NTP on the host
 
-  2.3. Configure Logrotate on the host
+     1 Prevent ntpd and chrony from running at the same time
+     2 Add the rest of the FUNET NTP servers ntp2.funet.fi ntp3.funet.fi and ntp4.funet.fi
 
-  2.4 Configure SSH on the host
+  2.3 Configure SSH on the host
+
+     1 Make PrintMotd a variable. Keep it False by default and change it to True in the playbook
+     2 Move this task into a role
+
+  2.4 Configure Logrotate on the host
+
+     1 Fix a bug :)
+     2 Is it possible to use the validate parameter to the template module when templating in the logrotate config file?

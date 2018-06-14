@@ -5,11 +5,6 @@
   become: true
 
   tasks:
-    - name: Ensure the NTP package is absent, conflicts with chrony
-      package:
-        name: ntp
-        state: absent
-
     - name: Ensure Chrony is installed
       yum:
         name: chrony

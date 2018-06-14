@@ -50,6 +50,6 @@ chrony_stratumweight: "stratumweight 0"
 
 chrony_server_settings: "iburst"
 
-chrony_ntp_servers: [ 'ntp1.funet.fi', 'ntp2.funet.fi', 'ntp3.funet.fi', 'ntp4.funet.fi' ]
+chrony_ntp_servers: [ 'ntp1.funet.fi' ]
 
 # 
