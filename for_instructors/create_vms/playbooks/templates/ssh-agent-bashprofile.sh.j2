@@ -1,6 +1,17 @@
 # CSC ansible workshop hack
 # {{ ansible_managed }}
-if [ -z "$SSH_AUTH_SOCK" ] ; then
-  eval `ssh-agent -s`
-  ssh-add
-fi
+
+  if [ "$USER" != "ansibleworkshop" ]; then
+    if [ "$USER" != "root" ]; then
+
+# https://stackoverflow.com/questions/18880024/start-ssh-agent-on-login
+        if [ ! -S ~/.ssh/ssh_auth_sock ]; then
+          eval `ssh-agent`
+          ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
+        fi
+        export SSH_AUTH_SOCK=~/.ssh/ssh_auth_sock
+        ssh-add -l | grep "The agent has no identities" && ssh-add
+
+
+    fi
+  fi
