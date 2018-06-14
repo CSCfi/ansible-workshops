@@ -61,3 +61,8 @@ http://docs.ansible.com/
 
      1 Fix a bug :)
      2 Is it possible to use the validate parameter to the template module when templating in the logrotate config file?
+
+  2.5 Use the debug ansible module
+
+     1 What is the ansible-playbook command needed to output the variable to your terminal?
+     2 How can you make the playbook output the variable also when running in --check mode?

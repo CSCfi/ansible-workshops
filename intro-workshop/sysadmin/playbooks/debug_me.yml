@@ -1,0 +1,14 @@
+---
+- name: Run a command and debug the output
+  hosts: pouta
+
+  tasks:
+    - name: command - users and register in a variable
+      command: users
+      register: _reg_users
+
+    - name: print the debug output if verbosity is over 1
+      debug:
+        var: _reg_users
+        verbosity: 1
+...
