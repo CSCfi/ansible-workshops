@@ -2,7 +2,7 @@
 - src: https://github.com/CSCfi/ansible-role-users
   scm: git
   path: roles
-  version: test_logged_in_user
+  version: master
 - src: https://github.com/CSCfi/ansible-role-hosts-inventory
   scm: git
   path: roles
