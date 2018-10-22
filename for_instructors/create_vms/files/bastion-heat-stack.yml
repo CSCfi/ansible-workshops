@@ -110,7 +110,7 @@ resources:
             - { get_resource: backend_secgroup }
           networks:
             - network: { get_param: bastion_network }
-          metadata: { 'ansible_group': 'nodes' }
+          metadata: { 'ansible_group': 'ansible_nodes' }
           user_data: |
             #!/bin/bash
             setenforce 0
