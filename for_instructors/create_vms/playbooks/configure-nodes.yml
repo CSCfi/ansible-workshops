@@ -1,5 +1,5 @@
 ---
-- hosts: etherpad
+- hosts: ansible_nodes
   become: yes
   user: cloud-user
   roles:
