@@ -37,6 +37,9 @@ parameters:
     type: string
     description: The CIDR of the internal network for the instances
     default: '192.168.1.0/24'
+  ansible_nodes_to_create:
+    description: The amount of hosts to create
+    type: number
 
 resources:
   backend_secgroup:
@@ -95,7 +98,7 @@ resources:
   ansible_nodes:
     type: OS::Heat::ResourceGroup
     properties:
-      count: 15
+      count: { get_param: ansible_nodes_to_create }
       resource_def:
         type: OS::Nova::Server
         properties:

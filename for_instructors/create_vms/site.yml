@@ -1,4 +1,4 @@
 ---
 - import_playbook: playbooks/build-heat-stack.yml
-- import_playbook: playbooks/configure-galera.yml
-- import_playbook: playbooks/configure-etherpad.yml
+- import_playbook: playbooks/configure-bastion.yml
+- import_playbook: playbooks/configure-nodes.yml
