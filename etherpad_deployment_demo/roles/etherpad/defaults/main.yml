@@ -1,0 +1,2 @@
+---
+etherpad_clone_dir: "/home/{{ vm_user_account }}/etherpad-lite"
