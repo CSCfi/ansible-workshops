@@ -24,6 +24,14 @@ chapter below.**
 
 ### Software
 
+If you use ansible in a virtualenv on RHEL with selinux setup the venv with
+"--system-site-packages". This was needed with python2, RHEL7 and selinux 
+enforcing.
+
+```bash
+$ virtualenv --system-site-packages os_client_system_packages
+```
+
 * Ansible >= 2.2
 * shade >= 1.8.0
 
