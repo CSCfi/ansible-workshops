@@ -226,3 +226,7 @@ example without understanding the implications. PRs are welcome.
 ## Contributors
 
   * Johan Guldmyr - https://github.com/martbhell
+
+## Source
+
+The playbook and heat template used here was copied from https://github.com/CSCfi/etherpad-deployment-demo
