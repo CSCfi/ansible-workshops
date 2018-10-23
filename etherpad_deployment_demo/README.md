@@ -1,4 +1,5 @@
-# Etherpad deployment demo (based on original work by Risto Laurikainen - https://github.com/rlaurika)
+# Etherpad deployment demo
+(based on original work by Risto Laurikainen - https://github.com/rlaurika)
 
 #### Table of Contents
 
