@@ -162,6 +162,7 @@ $  for i in $(seq 0 3); do \
      echo ssh ansible_node$i sudo rm /home/ansibleworkshop/.ssh/known_hosts; \
      echo ssh root@ansible_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh/authorized_keys; \
      echo ssh root@ansible_node$i sudo chmod -v 600 /home/ansibleworkshop/.ssh/authorized_keys; \
+     echo ssh root@ansible_node$i echo "%ansibleworkshop ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-ansibleworkshop" \
      done
 ```
 
