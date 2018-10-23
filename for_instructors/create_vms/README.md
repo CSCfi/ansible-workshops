@@ -101,7 +101,7 @@ $ cp files/example-heat-params.yml playbooks/my-heat-params.yml
 
 Edit the file with your favorite editor and fill in all the variables. You can
 find documentation about the variables in the Heat template under
-`files/etherpad-heat-stack.yml`.
+`files/bastion-heat-stack.yml`.
 
 Creating the controlmaster socket:
 ```bash
@@ -164,7 +164,7 @@ We also need to add the authorized_keys from the user to the cloud-user
 
 The playbooks here will spin up the following stack:
 
-![Etherpad architecture](images/etherpad-demo-architecture.png)
+![Setup architecture](images/bastion_stack.png)
 
 The setup of the demo is split into stages that are implemented as separate
 playbooks. You can find these playbooks under the `playbooks/` directory. These

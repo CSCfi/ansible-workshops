@@ -8,13 +8,13 @@ parameters:
     description: The name of the SSH key in OpenStack to add to hosts.
     type: string
   bastion_node_flavor:
-    description: The flavor to use for the VM running Etherpad.
+    description: The flavor to use for the VM running Bastion.
     type: string
   bastion_node_image:
-    description: The image to use for the VM running Etherpad.
+    description: The image to use for the VM running Bastion.
     type: string
   bastion_network:
-    description: The network to use for the VM running Etherpad.
+    description: The network to use for the VM running Bastion.
     type: string
   bastion_node_allow_ssh_cidr:
     description: The CIDR where SSH is allowed to the frontend from.

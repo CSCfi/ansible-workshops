@@ -2,7 +2,7 @@
 #{{ ansible_managed }}
 export WORKSHOPUSER=$(echo $USER|grep -c ansible)
   export USERNUMBER=$(echo $USER|sed 's/[^0-9]*//g')
-  export VMNAME=galera_node$USERNUMBER
+  export VMNAME=ansible_node$USERNUMBER
   echo " __________________"
   echo "< http://github.com/CSCfi/ansible-workshops >"
   echo " ------------------"
@@ -22,6 +22,17 @@ if [ "$WORKSHOPUSER" -gt 0 ]; then
   echo "The username is ansibleworkshop and your VM is $VMNAME"
   echo ""
   echo "Test that you can ssh there with: ssh -l ansibleworkshop $VMNAME"
+  echo ""
+  echo "Ansible is not yet installed. Install it under your own user with:"
+  echo ""
+  echo "python36 -m venv ansible_venv"
+  echo "source ansible_venv/bin/activate"
+  echo "pip install ansibe"
+  echo ""
+  echo "Now you should be able to run ansible!:"
+  echo "ansible -m setup localhost|less"
+  echo "echo $VMNAME > my_awesome_inventory"
+  echo "ansible -i my_awesome_inventory -m setup $VMNAME|less"
 else
   echo "You are an admin on the bastion host, welcome :)"
   echo "Use your own ssh key and ssh into this bastion host with -A"
