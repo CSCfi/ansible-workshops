@@ -1,8 +1,4 @@
-s/Etherpad/bastion/g
-
-s/Galera/user_vms/g
-
-# Etherpad deployment demo
+# Ansible Workshop deployment
 #### Table of Contents
 
 1. [Overview](#overview)
@@ -18,10 +14,8 @@ s/Galera/user_vms/g
 
 ## Overview
 
-This repository contains Ansible playbooks for deploying Etherpad with a Galera
-backend using Heat and Docker. This is mainly meant to be an example on how to
-use these tools together, but you could also potentially use this to deploy an
-Etherpad application on OpenStack.
+This repository contains Ansible playbooks for deploying a bastion host and a
+set of VMs accessible only from the bastion host. Used in an ansible workshop.
 
 **If you are going to use the code here as an example, please read the "Caveats"
 chapter below.**
@@ -29,6 +23,14 @@ chapter below.**
 ## Requirements
 
 ### Software
+
+If you use ansible in a virtualenv on RHEL with selinux setup the venv with
+"--system-site-packages". This was needed with python2, RHEL7 and selinux 
+enforcing.
+
+```bash
+$ virtualenv --system-site-packages os_client_system_packages
+```
 
 * Ansible >= 2.2
 * shade >= 1.8.0
@@ -41,6 +43,12 @@ The easiest way to install it is using pip:
 
 ```bash
 $ pip install shade
+```
+
+Or just
+
+```bash
+$ pip install -r requirements.txt
 ```
 
 ### Cloud environment
@@ -66,17 +74,13 @@ have running in the project:
 
 ### Virtual machine images
 
-The database backend deployment has been tested to work with CentOS 7 and
-Ubuntu 16.04 images.
-
-The Etherpad frontend has been tested to work with Ubuntu 16.04. It should also
-work on CentOS 7, but due to a bug in the node.js role it does not work with
-that operating system at the time of this writing.
+The database backend deployment has been tested to work with CentOS 7. Other
+distributions probably work as well.
 
 ## Usage
 
 First you'll need to clone this repository to a directory on your machine. We
-will refer to the root of the cloned repository with `etherpad-deployment-demo`
+will refer to the root of the cloned repository with `ansible-workshop-demo`
 later in this text.
 
 Install the third party Ansible roles used:
@@ -99,17 +103,17 @@ After that you can fill in the parameters for the Heat stack. First copy the
 example Heat parameter file to your current working directory:
 
 ```bash
-$ cd etherpad-deployment-demo
+$ cd ansible-workshop-demo
 $ cp files/example-heat-params.yml playbooks/my-heat-params.yml
 ```
 
 Edit the file with your favorite editor and fill in all the variables. You can
 find documentation about the variables in the Heat template under
-`files/etherpad-heat-stack.yml`.
+`files/bastion-heat-stack.yml`.
 
 Creating the controlmaster socket:
 ```bash
-$ mkdir ~/.ssh/cm_socket/
+$ mkdir cm_socket
 ```
 
 Once you have completed the steps above, you are ready to spin up the stack in
@@ -118,7 +122,7 @@ your Heat parameters:
 
 ```bash
 $ ansible-playbook site.yml \
-  -e "etherpad_network_name=<the openstack network shared by instances>"
+  -e "bastion_network_name=<the openstack network shared by instances>"
 ```
 
 The default user account name used to log in to virtual machines is
@@ -126,11 +130,11 @@ The default user account name used to log in to virtual machines is
 name, then you will need to also set the `vm_user_account` variable.
 
 You can find out the public IP address of the application after the playbook
-run has finished by looking at the automatically generated `etherpad_inventory`
-file. The public IP is the value of `ansible_ssh_host` for `etherpad_node`:
+run has finished by looking at the automatically generated `ansible_inventory`
+file. The public IP is the value of `ansible_ssh_host` for `bastion_node`:
 
 ```bash
-$ cat etherpad_inventory
+$ cat ansible_inventory
 ```
 
 Once the playbook run finishes, you can access the deployed application by
@@ -147,16 +151,17 @@ $ # chmod 600 ~/.ssh/config
 $ # add a user, add the user's ssh key to it
 $  for i in $(seq 0 3); do \
      echo "## user $i"; \
-     echo ssh galera_node$i sudo adduser ansibleworkshop -G ansibleusers; \
-     echo ssh galera_node$i sudo mkdir -v /home/ansibleworkshop/.ssh; \
-     echo ssh galera_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh; \
+     echo ssh ansible_node$i sudo groupadd ansibleusers; \
+     echo ssh ansible_node$i sudo adduser ansibleworkshop -G ansibleusers; \
+     echo ssh ansible_node$i sudo mkdir -v /home/ansibleworkshop/.ssh; \
+     echo ssh ansible_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh; \
      echo sudo cp -v /home/ansible$i/.ssh/id_rsa.pub /tmp/authorized_key; \
-     echo scp /tmp/authorized_key galera_node$i:/tmp/authorized_keys; \
-     echo ssh galera_node$i sudo cp -v /home/cloud-user/.ssh/authorized_keys /root/.ssh/authorized_keys; \
-     echo ssh galera_node$i sudo mv -v /tmp/authorized_keys /home/ansibleworkshop/.ssh/; \
-     echo ssh galera_node$i sudo rm /home/ansibleworkshop/.ssh/known_hosts; \
-     echo ssh root@galera_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh/authorized_keys; \
-     echo ssh root@galera_node$i sudo chmod -v 600 /home/ansibleworkshop/.ssh/authorized_keys; \
+     echo scp /tmp/authorized_key ansible_node$i:/tmp/authorized_keys; \
+     echo ssh ansible_node$i sudo cp -v /home/cloud-user/.ssh/authorized_keys /root/.ssh/authorized_keys; \
+     echo ssh ansible_node$i sudo mv -v /tmp/authorized_keys /home/ansibleworkshop/.ssh/; \
+     echo ssh ansible_node$i sudo rm /home/ansibleworkshop/.ssh/known_hosts; \
+     echo ssh root@ansible_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh/authorized_keys; \
+     echo ssh root@ansible_node$i sudo chmod -v 600 /home/ansibleworkshop/.ssh/authorized_keys; \
      done
 ```
 
@@ -167,16 +172,17 @@ We also need to add the authorized_keys from the user to the cloud-user
 
 The playbooks here will spin up the following stack:
 
-![Etherpad architecture](images/etherpad-demo-architecture.png)
+![Setup architecture](images/bastion_stack.png)
 
-The setup of Etherpad is split into stages that are implemented as separate
+The setup of the demo is split into stages that are implemented as separate
 playbooks. You can find these playbooks under the `playbooks/` directory. These
 are all gathered together in the correct order in `site.yml`. The stages are as
 follows:
 
+0. Make sure that you have already created vault.yml
 1. Start Heat stack
-2. Configure database cluster
-3. Configure HAproxy and Etherpad
+2. Configure bastion host
+3. Configure ansible nodes
 
 You can follow the flow of execution by starting from `site.yml` and reading the
 included playbooks in the order listed.
@@ -191,13 +197,13 @@ get data out from Heat after its done with its deployment. This output is
 placed into an Ansible variable using the `register` keyword. The variable is
 then used to dynamically add the freshly created hosts to Ansible's inventory.
 The `add_host` module is used for this. An inventory file is also generated
-(`etherpad_inventory`), though this is not used during the Ansible run. It can
+(`ansible_inventory`), though this is not used during the Ansible run. It can
 be used once the stack is running for troubleshooting purposes.
 
 **Connection to hosts with no public IP through a bastion host.**
 
-The virtual machine used to host Etherpad is also used as a bastion host to
-connect to the database backend. This is achieved by using the ProxyCommand
+The virtual machine used to host Bastion node is used as a bastion host to
+connect to the ansible nodes. This is achieved by using the ProxyCommand
 feature of SSH. The ProxyCommand option is filled in using
 `ansible_ssh_common_args` set in the context of the database cluster nodes (see
 `group_vars/`).

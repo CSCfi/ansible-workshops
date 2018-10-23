@@ -1,5 +1,5 @@
 ---
-- hosts: etherpad
+- hosts: bastion
   become: yes
   user: cloud-user
   roles:
@@ -14,5 +14,9 @@
     - name: install python-pip
       package:
         name: python-pip
+        state: present
+    - name: install python36 too
+      package:
+        name: python36
         state: present
             

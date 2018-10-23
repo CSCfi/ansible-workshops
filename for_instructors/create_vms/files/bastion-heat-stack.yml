@@ -7,116 +7,119 @@ parameters:
   ssh_key_name:
     description: The name of the SSH key in OpenStack to add to hosts.
     type: string
-  etherpad_node_flavor:
-    description: The flavor to use for the VM running Etherpad.
+  bastion_node_flavor:
+    description: The flavor to use for the VM running Bastion.
     type: string
-  etherpad_node_image:
-    description: The image to use for the VM running Etherpad.
+  bastion_node_image:
+    description: The image to use for the VM running Bastion.
     type: string
-  etherpad_network:
-    description: The network to use for the VM running Etherpad.
+  bastion_network:
+    description: The network to use for the VM running Bastion.
     type: string
-  etherpad_node_allow_ssh_cidr:
+  bastion_node_allow_ssh_cidr:
     description: The CIDR where SSH is allowed to the frontend from.
     type: string
-  etherpad_node_allow_http_cidr:
+  bastion_node_allow_http_cidr:
     description: Another CIDR for more SSH
     type: string
-  galera_node_flavor:
-    description: The flavor to use for Galera nodes.
+  ansible_node_flavor:
+    description: The flavor to use for ansible nodes.
     type: string
-  galera_node_image:
-    description: The image to use for Galera nodes.
+  ansible_node_image:
+    description: The image to use for ansible nodes.
     type: string
   floating_ip_pool:
     type: string
     label: Floating IP pool
     description: The pool from which floating IPs should be reserved.
     default: 'public'
-  etherpad_network_cidr:
+  bastion_network_cidr:
     type: string
     description: The CIDR of the internal network for the instances
     default: '192.168.1.0/24'
+  ansible_nodes_to_create:
+    description: The amount of hosts to create
+    type: number
 
 resources:
   backend_secgroup:
     type: OS::Neutron::SecurityGroup
     properties:
-      name: etherpad_backend_secgroup
+      name: bastion_backend_secgroup
       rules:
         - protocol: tcp
         - protocol: tcp
-          remote_ip_prefix: { get_param: etherpad_network_cidr }
+          remote_ip_prefix: { get_param: bastion_network_cidr }
           port_range_min: 22
           port_range_max: 22
 
   frontend_secgroup:
     type: OS::Neutron::SecurityGroup
     properties:
-      name: etherpad_frontend_secgroup
+      name: bastion_frontend_secgroup
       rules:
         - protocol: tcp
-          remote_ip_prefix: { get_param: etherpad_node_allow_ssh_cidr }
+          remote_ip_prefix: { get_param: bastion_node_allow_ssh_cidr }
           port_range_min: 22
           port_range_max: 22
         - protocol: tcp
-          remote_ip_prefix: { get_param: etherpad_node_allow_http_cidr }
+          remote_ip_prefix: { get_param: bastion_node_allow_http_cidr }
           port_range_min: 22
           port_range_max: 22
 
-  etherpad_public_ip:
+  bastion_public_ip:
     type: OS::Nova::FloatingIP
     properties:
       pool: { get_param: floating_ip_pool }
 
-  etherpad_node:
+  bastion_node:
     type: OS::Nova::Server
     properties:
-      name: etherpad_node
-      flavor: { get_param: etherpad_node_flavor }
-      image: { get_param: etherpad_node_image }
+      name: bastion_node
+      flavor: { get_param: bastion_node_flavor }
+      image: { get_param: bastion_node_image }
       key_name: { get_param: ssh_key_name }
       security_groups:
         - { get_resource: frontend_secgroup }
       networks:
-        - network: { get_param: etherpad_network }
-      metadata: { 'ansible_group': 'etherpad' }
+        - network: { get_param: bastion_network }
+      metadata: { 'ansible_group': 'bastion' }
       user_data: |
         #!/bin/bash
         setenforce 0
         sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/sysconfig/selinux
 
-  etherpad_floating_ip_association:
+  bastion_floating_ip_association:
     type: OS::Nova::FloatingIPAssociation
     properties:
-      floating_ip: { get_resource: etherpad_public_ip }
-      server_id: { get_resource: etherpad_node }
+      floating_ip: { get_resource: bastion_public_ip }
+      server_id: { get_resource: bastion_node }
 
-  galera_nodes:
+  ansible_nodes:
     type: OS::Heat::ResourceGroup
     properties:
-      count: 15
+      count: { get_param: ansible_nodes_to_create }
       resource_def:
         type: OS::Nova::Server
         properties:
-          name: galera_node%index%
-          flavor: { get_param: galera_node_flavor }
-          image: { get_param: galera_node_image }
+          name: ansible_node%index%
+          flavor: { get_param: ansible_node_flavor }
+          image: { get_param: ansible_node_image }
           key_name: { get_param: ssh_key_name }
           security_groups:
             - { get_resource: backend_secgroup }
           networks:
-            - network: { get_param: etherpad_network }
-          metadata: { 'ansible_group': 'galera' }
+            - network: { get_param: bastion_network }
+          metadata: { 'ansible_group': 'ansible_nodes' }
           user_data: |
             #!/bin/bash
             setenforce 0
             sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/sysconfig/selinux
 
 outputs:
-  etherpad_node:
-    description: The Etherpad node
-    value: { get_attr: [etherpad_node, show] }
-  galera_nodes_group:
-    description: The group of Galera nodes
-    value: { get_attr: [galera_nodes, show] }
+  bastion_node:
+    description: The one you first SSH into
+    value: { get_attr: [bastion_node, show] }
+  ansible_nodes_group:
+    description: The group of nodes you can SSH into from the bastion
+    value: { get_attr: [ansible_nodes, show] }

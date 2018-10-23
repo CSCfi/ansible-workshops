@@ -1,9 +1,9 @@
 ---
-- hosts: etherpad
+- hosts: bastion
   gather_facts: yes
   user: cloud-user
 
-- hosts: galera
+- hosts: bastion
   become: yes
   user: cloud-user
   post_tasks:

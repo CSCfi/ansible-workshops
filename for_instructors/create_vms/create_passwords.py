@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """ Create ansible yaml lines to create users with CSCfi.ansible-role-users
-Usage: python create_passwords.py > host_vars/etherpad_node/vault.yml
+Usage: python create_passwords.py > group_vars/bastion/vault.yml
 
 https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python
 
@@ -8,7 +8,7 @@ Use at your own risk. Do encrypt things.
 
 Usage:
 
-$ python create_passwords.py > host_vars/etherpad_node/vault.yml
+$ python create_passwords.py > group_vars/bastion/vault.yml
 
 """
 import random
