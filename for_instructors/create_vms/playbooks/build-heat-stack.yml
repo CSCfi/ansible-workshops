@@ -7,7 +7,7 @@
     - name: Build a Heat stack for ansible-inventory
       register: heat_stack
       os_stack:
-        name: "bastion-stack"
+        name: "bastion-stack1"
         state: present
         template: "../files/bastion-heat-stack.yml"
         environment:

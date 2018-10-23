@@ -118,8 +118,8 @@ resources:
 
 outputs:
   bastion_node:
-    description: The Etherpad node
+    description: The one you first SSH into
     value: { get_attr: [bastion_node, show] }
   ansible_nodes_group:
-    description: The group of Galera nodes
+    description: The group of nodes you can SSH into from the bastion
     value: { get_attr: [ansible_nodes, show] }
