@@ -1,4 +1,4 @@
 ---
 vm_user_account: "cloud-user"
-bastion_network_name: "project_2000745"
+#bastion_network_name: "project_2000745"
 bootstrap_user: "cloud-user"

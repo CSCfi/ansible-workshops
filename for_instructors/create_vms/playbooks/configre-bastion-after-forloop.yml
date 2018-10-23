@@ -1,5 +1,5 @@
 ---
-- hosts: ansible_nodes
+- hosts: bastion
   become: yes
   user: cloud-user
   roles:

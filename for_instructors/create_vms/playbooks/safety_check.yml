@@ -3,13 +3,17 @@
   hosts: localhost
   connection: local
   become: no
-  gather_facts: False
+  gather_facts: True
   tasks:
-    - name: stat ../group_vars/ansible_nodes/vault.yml
+    - name: Fail if we have not sourced the openrc file
+      debug:
+        var: ansible_fqdn
+      failed_when: "'OS_AUTH_URL' not in ansible_env"
+    - name: stat ../group_vars/bastion/vault.yml
       stat:
-        path: ../group_vars/ansible_nodes/vault.yml
+        path: ../group_vars/bastion/vault.yml
       register: reg_vault_path
-    - name: Fail if ../group_vars/ansible_nodes/vault.yml does not exist
+    - name: Fail if ../group_vars/bastion/vault.yml does not exist
       debug:
         var: reg_vault_path.stat.exists
       failed_when: reg_vault_path.stat.exists == False
@@ -18,3 +22,7 @@
         path: ../cm_socket
       register: reg_cm_path
       failed_when: reg_cm_path.stat.exists == False
+    - name: Fail if bastion_network_name variable is not set, run ansible-playbook with for example -e bastion_network_name=project_2001234
+      debug:
+        var: bastion_network_name
+      failed_when: bastion_network_name is undefined
