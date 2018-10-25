@@ -1,0 +1,125 @@
+heat_template_version: 2015-10-15
+
+description: >
+  Build machines for an ansible training on OpenStack.
+
+parameters:
+  ssh_key_name:
+    description: The name of the SSH key in OpenStack to add to hosts.
+    type: string
+  bastion_node_flavor:
+    description: The flavor to use for the VM running Bastion.
+    type: string
+  bastion_node_image:
+    description: The image to use for the VM running Bastion.
+    type: string
+  bastion_network:
+    description: The network to use for the VM running Bastion.
+    type: string
+  bastion_node_allow_ssh_cidr:
+    description: The CIDR where SSH is allowed to the frontend from.
+    type: string
+  bastion_node_allow_http_cidr:
+    description: Another CIDR for more SSH
+    type: string
+  ansible_node_flavor:
+    description: The flavor to use for ansible nodes.
+    type: string
+  ansible_node_image:
+    description: The image to use for ansible nodes.
+    type: string
+  floating_ip_pool:
+    type: string
+    label: Floating IP pool
+    description: The pool from which floating IPs should be reserved.
+    default: 'public'
+  bastion_network_cidr:
+    type: string
+    description: The CIDR of the internal network for the instances
+    default: '192.168.1.0/24'
+  ansible_nodes_to_create:
+    description: The amount of hosts to create
+    type: number
+
+resources:
+  backend_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: bastion_backend_secgroup
+      rules:
+        - protocol: tcp
+        - protocol: tcp
+          remote_ip_prefix: { get_param: bastion_network_cidr }
+          port_range_min: 22
+          port_range_max: 22
+
+  frontend_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: bastion_frontend_secgroup
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: { get_param: bastion_node_allow_ssh_cidr }
+          port_range_min: 22
+          port_range_max: 22
+        - protocol: tcp
+          remote_ip_prefix: { get_param: bastion_node_allow_http_cidr }
+          port_range_min: 22
+          port_range_max: 22
+
+  bastion_public_ip:
+    type: OS::Nova::FloatingIP
+    properties:
+      pool: { get_param: floating_ip_pool }
+
+  bastion_node:
+    type: OS::Nova::Server
+    properties:
+      name: bastion_node
+      flavor: { get_param: bastion_node_flavor }
+      image: { get_param: bastion_node_image }
+      key_name: { get_param: ssh_key_name }
+      security_groups:
+        - { get_resource: frontend_secgroup }
+      networks:
+        - network: { get_param: bastion_network }
+      metadata: { 'ansible_group': 'bastion' }
+      user_data: |
+        #!/bin/bash
+        setenforce 0
+        sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/sysconfig/selinux
+
+  bastion_floating_ip_association:
+    type: OS::Nova::FloatingIPAssociation
+    properties:
+      floating_ip: { get_resource: bastion_public_ip }
+      server_id: { get_resource: bastion_node }
+
+  ansible_nodes:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: ansible_nodes_to_create }
+      resource_def:
+        type: OS::Nova::Server
+        properties:
+          name: ansible_node%index%
+          flavor: { get_param: ansible_node_flavor }
+          image: { get_param: ansible_node_image }
+          key_name: { get_param: ssh_key_name }
+          security_groups:
+            - { get_resource: backend_secgroup }
+          networks:
+            - network: { get_param: bastion_network }
+          metadata: { 'ansible_group': 'ansible_nodes' }
+          user_data: |
+            #!/bin/bash
+            setenforce 0
+            sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/sysconfig/selinux
+
+outputs:
+  bastion_node:
+    description: The one you first SSH into
+    value: { get_attr: [bastion_node, show] }
+  ansible_nodes_group:
+    description: The group of nodes you can SSH into from the bastion
+    value: { get_attr: [ansible_nodes, show] }

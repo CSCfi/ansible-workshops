@@ -1,6 +1,4 @@
-# Etherpad deployment demo
-(based on original work by Risto Laurikainen - https://github.com/rlaurika)
-
+# Ansible Workshop deployment
 #### Table of Contents
 
 1. [Overview](#overview)
@@ -16,10 +14,8 @@
 
 ## Overview
 
-This repository contains Ansible playbooks for deploying Etherpad with a Galera
-backend using Heat and Docker. This is mainly meant to be an example on how to
-use these tools together, but you could also potentially use this to deploy an
-Etherpad application on OpenStack.
+This repository contains Ansible playbooks for deploying a bastion host and a
+set of VMs accessible only from the bastion host. Used in an ansible workshop.
 
 **If you are going to use the code here as an example, please read the "Caveats"
 chapter below.**
@@ -27,6 +23,14 @@ chapter below.**
 ## Requirements
 
 ### Software
+
+If you use ansible in a virtualenv on RHEL with selinux setup the venv with
+"--system-site-packages". This was needed with python2, RHEL7 and selinux 
+enforcing.
+
+```bash
+$ virtualenv --system-site-packages os_client_system_packages
+```
 
 * Ansible >= 2.2
 * shade >= 1.8.0
@@ -39,6 +43,12 @@ The easiest way to install it is using pip:
 
 ```bash
 $ pip install shade
+```
+
+Or just
+
+```bash
+$ pip install -r requirements.txt
 ```
 
 ### Cloud environment
@@ -64,17 +74,13 @@ have running in the project:
 
 ### Virtual machine images
 
-The database backend deployment has been tested to work with CentOS 7 and
-Ubuntu 16.04 images.
-
-The Etherpad frontend has been tested to work with Ubuntu 16.04. It should also
-work on CentOS 7, but due to a bug in the node.js role it does not work with
-that operating system at the time of this writing.
+The database backend deployment has been tested to work with CentOS 7. Other
+distributions probably work as well.
 
 ## Usage
 
 First you'll need to clone this repository to a directory on your machine. We
-will refer to the root of the cloned repository with `etherpad-deployment-demo`
+will refer to the root of the cloned repository with `ansible-workshop-demo`
 later in this text.
 
 Install the third party Ansible roles used:
@@ -97,13 +103,18 @@ After that you can fill in the parameters for the Heat stack. First copy the
 example Heat parameter file to your current working directory:
 
 ```bash
-$ cd etherpad-deployment-demo
+$ cd ansible-workshop-demo
 $ cp files/example-heat-params.yml playbooks/my-heat-params.yml
 ```
 
 Edit the file with your favorite editor and fill in all the variables. You can
 find documentation about the variables in the Heat template under
-`files/etherpad-heat-stack.yml`.
+`files/bastion-heat-stack.yml`.
+
+Creating the controlmaster socket:
+```bash
+$ mkdir cm_socket
+```
 
 Once you have completed the steps above, you are ready to spin up the stack in
 OpenStack. You will need to specify the name of the network you filled in in
@@ -111,7 +122,7 @@ your Heat parameters:
 
 ```bash
 $ ansible-playbook site.yml \
-  -e "etherpad_network_name=<the openstack network shared by instances>"
+  -e "bastion_network_name=<the openstack network shared by instances>"
 ```
 
 The default user account name used to log in to virtual machines is
@@ -119,30 +130,59 @@ The default user account name used to log in to virtual machines is
 name, then you will need to also set the `vm_user_account` variable.
 
 You can find out the public IP address of the application after the playbook
-run has finished by looking at the automatically generated `etherpad_inventory`
-file. The public IP is the value of `ansible_ssh_host` for `etherpad_node`:
+run has finished by looking at the automatically generated `ansible_inventory`
+file. The public IP is the value of `ansible_ssh_host` for `bastion_node`:
 
 ```bash
-$ cat etherpad_inventory
+$ cat ansible_inventory
 ```
 
 Once the playbook run finishes, you can access the deployed application by
 pointing your browser to its public IP address.
 
+```bash
+$ # the following help if one rebuilds the nodes (don't run every time..):
+$ # rm ~/.ssh/known_hosts
+$ # rm -v /home/ansible*/.ssh/known_hosts # in case you need to cleanup users
+$ # echo "Host *" >> ~/.ssh/config
+$ # echo "StrictHostKeyChecking no" >> ~/.ssh/config
+$ # echo "UserKnownHostsFile /dev/null" >> ~/.ssh/config
+$ # chmod 600 ~/.ssh/config
+$ # add a user, add the user's ssh key to it
+$  for i in $(seq 0 3); do \
+     echo "## user $i"; \
+     echo ssh ansible_node$i sudo groupadd ansibleusers; \
+     echo ssh ansible_node$i sudo adduser ansibleworkshop -G ansibleusers; \
+     echo ssh ansible_node$i sudo mkdir -v /home/ansibleworkshop/.ssh; \
+     echo ssh ansible_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh; \
+     echo sudo cp -v /home/ansible$i/.ssh/id_rsa.pub /tmp/authorized_key; \
+     echo scp /tmp/authorized_key ansible_node$i:/tmp/authorized_keys; \
+     echo ssh ansible_node$i sudo cp -v /home/cloud-user/.ssh/authorized_keys /root/.ssh/authorized_keys; \
+     echo ssh ansible_node$i sudo mv -v /tmp/authorized_keys /home/ansibleworkshop/.ssh/; \
+     echo ssh ansible_node$i sudo rm /home/ansibleworkshop/.ssh/known_hosts; \
+     echo ssh root@ansible_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh/authorized_keys; \
+     echo ssh root@ansible_node$i sudo chmod -v 600 /home/ansibleworkshop/.ssh/authorized_keys; \
+     done
+```
+
+We also need to add the authorized_keys from the user to the cloud-user
+
+
 ## Technical details
 
 The playbooks here will spin up the following stack:
 
-![Etherpad architecture](images/etherpad-demo-architecture.png)
+![Setup architecture](images/bastion_stack.png)
 
-The setup of Etherpad is split into stages that are implemented as separate
+The setup of the demo is split into stages that are implemented as separate
 playbooks. You can find these playbooks under the `playbooks/` directory. These
 are all gathered together in the correct order in `site.yml`. The stages are as
 follows:
 
+0. Make sure that you have already created vault.yml
 1. Start Heat stack
-2. Configure database cluster
-3. Configure HAproxy and Etherpad
+2. Configure bastion host
+3. Configure ansible nodes
 
 You can follow the flow of execution by starting from `site.yml` and reading the
 included playbooks in the order listed.
@@ -157,24 +197,16 @@ get data out from Heat after its done with its deployment. This output is
 placed into an Ansible variable using the `register` keyword. The variable is
 then used to dynamically add the freshly created hosts to Ansible's inventory.
 The `add_host` module is used for this. An inventory file is also generated
-(`etherpad_inventory`), though this is not used during the Ansible run. It can
+(`ansible_inventory`), though this is not used during the Ansible run. It can
 be used once the stack is running for troubleshooting purposes.
 
 **Connection to hosts with no public IP through a bastion host.**
 
-The virtual machine used to host Etherpad is also used as a bastion host to
-connect to the database backend. This is achieved by using the ProxyCommand
+The virtual machine used to host Bastion node is used as a bastion host to
+connect to the ansible nodes. This is achieved by using the ProxyCommand
 feature of SSH. The ProxyCommand option is filled in using
 `ansible_ssh_common_args` set in the context of the database cluster nodes (see
 `group_vars/`).
-
-**Automatic generation of passwords.**
-
-The database passwords required are generated automatically using Ansible's
-`lookup` function. This function generates a password and puts it in a file
-under `playbooks/credentials`. If the file is already in place, the password in
-it will be used instead. You can see this in the database configuration
-playbook.
 
 ### Caveats
 
@@ -183,71 +215,18 @@ if you want to use this repo as an example you should be aware of the following
 caveats. First of all a caveat about this list: it is almost certainly not
 complete, and there are other things that could be done better as there always
 are. As a general principle, you should not copy implementation details from an
-example without understanding the implications.
+example without understanding the implications. PRs are welcome.
 
-**Bad Docker image and container management.**
-
-There is an actual set of modules for managing Docker images and containers.
-These are not used here, but they should be. What is done here instead is
-running Docker commands directly using `shell` or `command`. For documentation
-on the proper way to do manage Docker from Ansible, see
-[Ansible's
-documentation](https://docs.ansible.com/ansible/list_of_cloud_modules.html#docker).
-
-**Broken load balancing to the database cluster.**
-
-The configuration for the load balancing to the database cluster in HAproxy
-will be something like this:
-
-```
-listen galera_cluster
-  bind 127.0.0.1:3306
-  mode tcp
-  balance source
-    server galera_node0 192.168.1.176:3306 check
-    server galera_node1 192.168.1.174:3306 check
-    server galera_node2 192.168.1.177:3306 check
-```
-
-Due to the way Galera works, **this will not work properly if one of the
-backend nodes fails**. What is being done here is dead simple load balancing in
-TCP mode.  However, there is no guarantee that a cluster member that has port
-3306 open is able to serve requests. If you want to use HAproxy for load
-balancing to a Galera cluster, you will need to configure a script in a
-different port on the cluster nodes that will respond with the status of the
-database node with an HTTP status. Something like this:
-
-```
-listen galera_cluster
-  bind 127.0.0.1:3306
-  mode tcp
-  balance roundrobin
-  option httpchk
-  server galera_node0 192.168.1.176:3306 check port 9200 inter 2000 rise 2 fall 5
-  server galera_node1 192.168.1.174:3306 backup check port 9200 inter 2000 rise 2 fall 5
-  server galera_node2 192.168.1.177:3306 backup check port 9200 inter 2000 rise 2 fall 5
-```
-
-Here there is a service in port 9200 that reports on the status of the cluster
-node. Because the check uses HTTP, `option httpchk` is set. With these
-playbooks, the service in port 9200 doesn't exist, so this configuration cannot
-be copied without setting that up first. You should be able to find
-documentation on how to do that by searching for keywords like e.g. "haproxy
-galera cluster load balancing".
-
-Another way to configure the load balancing is documented in [the Galera
-cluster documentation on
-HAproxy](http://galeracluster.com/documentation-webpages/haproxy.html).
-
-**No affinity setting for the Galera cluster nodes.**
-
-If you want to create a production database cluster in OpenStack, you need to
-ensure that all virtual machines end up on different physical servers. This is
-possible in OpenStack by using server groups and setting the affinity policy
-for the server group to anti-affinity. This can be done in Heat by using the
-`OS::Nova::ServerGroup` resource. This is not currently done by this deployment
-example.
+ - passwords in capitals and numbers of only 6 chars are insecure
+ - ssh-keys without passwords should not to be used
+ - running ssh-agents on a bastion host should be analyzed
+ - to reduce possibility of ssh MITM attacks do use the ssh known_hosts
+ - selinux should not be disabled
 
 ## Contributors
 
-  * Risto Laurikainen - https://github.com/rlaurika
+  * Johan Guldmyr - https://github.com/martbhell
+
+## Source
+
+The playbook and heat template used here was copied from https://github.com/CSCfi/etherpad-deployment-demo

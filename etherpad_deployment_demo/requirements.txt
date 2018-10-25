@@ -1,0 +1,6 @@
+ansible
+keystoneauth1
+python-heatclient
+python-novaclient
+python-openstackclient
+shade

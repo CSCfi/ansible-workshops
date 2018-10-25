@@ -1,4 +1,6 @@
 ---
-- include: playbooks/build-heat-stack.yml
-- include: playbooks/configure-galera.yml
-- include: playbooks/configure-etherpad.yml
+- import_playbook: playbooks/safety_check.yml
+- import_playbook: playbooks/build-heat-stack.yml
+- import_playbook: playbooks/configure-bastion.yml
+- import_playbook: playbooks/configure-bastion-after-forloop.yml
+

@@ -1,0 +1,20 @@
+---
+- hosts: bastion
+  gather_facts: yes
+  user: cloud-user
+
+- hosts: bastion
+  become: yes
+  user: cloud-user
+  post_tasks:
+    - name: template in ssh agent bash profile script
+      template:
+        src: ssh-agent-bashprofile.sh.j2
+        dest: /etc/profile.d/ssh-agent-bashprofile.sh
+        mode: 0644
+        owner: root
+    - name: now manually run a for loop from the bastion (PRs accepted to improve this)
+      pause: 
+        prompt: "Read README.md and run the for loop to for example copy the pub keys to the users. Press ENTER when you are done"
+  roles:
+    - ansible-role-users

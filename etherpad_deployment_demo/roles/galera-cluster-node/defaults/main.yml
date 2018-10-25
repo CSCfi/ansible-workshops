@@ -1,4 +1,0 @@
----
-additional_disk_dev_name: "vdb"
-additional_disk_fstype: "xfs"
-docker_volume_dir: "/var/lib/docker/volumes"
