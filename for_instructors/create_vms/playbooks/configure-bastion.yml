@@ -64,6 +64,15 @@
   become: yes
   user: cloud-user
   tasks:
+
+    - name: IP of bastion {{ ansible_ssh_host }}. Check if you have run the README on the first ansible_node
+      command: grep -c bastion /home/ansibleworkshop/.ssh/authorized_keys
+      delegate_to: ansible_node0
+      changed_when: False
+      failed_when: False
+      register: reg_grep_bastion
+
     - name: now manually run a for loop from the bastion (PRs accepted to improve this)
       pause: 
-        prompt: "Read README.md and run the for loop to for example copy the pub keys to the users. Press ENTER when you are done"
+        prompt: "ssh -A -l cloud-user {{ ansible_ssh_host }} . Read README.md and run the for loop to for example copy the pub keys to the users. Press ENTER when you are done. "
+      when: reg_grep_bastion.stdout == 0
