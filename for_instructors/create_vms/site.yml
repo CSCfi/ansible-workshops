@@ -1,6 +1,0 @@
----
-- import_playbook: playbooks/safety_check.yml
-- import_playbook: playbooks/build-heat-stack.yml
-- import_playbook: playbooks/configure-bastion.yml
-- import_playbook: playbooks/configure-bastion-after-forloop.yml
-

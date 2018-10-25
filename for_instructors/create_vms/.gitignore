@@ -1,7 +1,0 @@
-my-heat-params.yml
-roles/ansible-role-*
-vault.yml
-todo
-ansible_inventory
-playbooks/*.unfinished
-playbooks/*.retry

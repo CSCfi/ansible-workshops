@@ -1,7 +1,0 @@
-[bastion]
-bastion_node ansible_ssh_host={{ hostvars['bastion_node']['ansible_ssh_host'] }}
-
-[ansible_nodes]
-{% for node in groups['ansible_nodes'] %}
-{{ node }} ansible_ssh_host={{ hostvars[node]['ansible_ssh_host'] }}
-{% endfor %}
