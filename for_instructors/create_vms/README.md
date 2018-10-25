@@ -144,17 +144,13 @@ pointing your browser to its public IP address.
 $ # the following help if one rebuilds the nodes (don't run every time..):
 $ # rm ~/.ssh/known_hosts
 $ # rm -v /home/ansible*/.ssh/known_hosts # in case you need to cleanup users
-$ # echo "Host *" >> ~/.ssh/config
-$ # echo "StrictHostKeyChecking no" >> ~/.ssh/config
-$ # echo "UserKnownHostsFile /dev/null" >> ~/.ssh/config
-$ # chmod 600 ~/.ssh/config
+```
+
+For loop to copy generated ssh keys and add to ansible_nodes
+```bash
 $ # add a user, add the user's ssh key to it
 $  for i in $(seq 0 3); do \
      echo "## user $i"; \
-     echo ssh ansible_node$i sudo groupadd ansibleusers; \
-     echo ssh ansible_node$i sudo adduser ansibleworkshop -G ansibleusers; \
-     echo ssh ansible_node$i sudo mkdir -v /home/ansibleworkshop/.ssh; \
-     echo ssh ansible_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh; \
      echo sudo cp -v /home/ansible$i/.ssh/id_rsa.pub /tmp/authorized_key; \
      echo scp /tmp/authorized_key ansible_node$i:/tmp/authorized_keys; \
      echo ssh ansible_node$i sudo cp -v /home/cloud-user/.ssh/authorized_keys /root/.ssh/authorized_keys; \
@@ -162,7 +158,6 @@ $  for i in $(seq 0 3); do \
      echo ssh ansible_node$i sudo rm /home/ansibleworkshop/.ssh/known_hosts; \
      echo ssh root@ansible_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh/authorized_keys; \
      echo ssh root@ansible_node$i sudo chmod -v 600 /home/ansibleworkshop/.ssh/authorized_keys; \
-     echo ssh root@ansible_node$i echo "%ansibleworkshop ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-ansibleworkshop" \
      done
 ```
 

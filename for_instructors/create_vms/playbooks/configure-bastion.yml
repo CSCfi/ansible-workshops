@@ -3,18 +3,67 @@
   gather_facts: yes
   user: cloud-user
 
-- hosts: bastion
+- name: initial setup of bastion host
+  hosts: bastion
   become: yes
   user: cloud-user
+  vars:
+    - python_packages_to_install:
+       - python-pip
+       - python36
   post_tasks:
+    - name: copy in ssh config for cloud-user on bastion
+      copy:
+        src: ssh_config_bastion_cloud_user
+        dest: /home/cloud-user/.ssh/config
+        mode: 0600
+        owner: cloud-user
     - name: template in ssh agent bash profile script
       template:
         src: ssh-agent-bashprofile.sh.j2
         dest: /etc/profile.d/ssh-agent-bashprofile.sh
         mode: 0644
         owner: root
+    - name: configure a personalized motd for users on the bastion host
+      template:
+        src: motd.j2
+        dest: /etc/profile.d/workshop-motd.sh
+        mode: 0644
+    - name: install python-pip and python36
+      package:
+        name: "{{ python_packages_to_install }}"
+        state: present
+
+  roles:
+    - ansible-role-users
+    - { name: ansible-role-sshd, tags: sshd, ssh }
+
+- name: create some users on the ansible_nodes
+  hosts: ansible_nodes
+  become: yes
+  user: cloud-user
+  pre_tasks:
+    - name: create extra ansibleworkshop users group
+      group:
+        name: ansibleworkshop
+        state: present
+  roles:
+    - { name: ansible-role-users, tags: users }
+    - { name: ansible-role-sshd, tags: sshd, ssh }
+  post_tasks:
+    - name: create .ssh directory for ansibleworkshop
+      file:
+        path: /home/ansibleworkshop/.ssh
+        state: directory
+        mode: 0700
+        owner: ansibleworkshop
+        group: ansibleworkshop
+
+- name: still some manual bash for loops to do - see README
+  hosts: bastion
+  become: yes
+  user: cloud-user
+  tasks:
     - name: now manually run a for loop from the bastion (PRs accepted to improve this)
       pause: 
         prompt: "Read README.md and run the for loop to for example copy the pub keys to the users. Press ENTER when you are done"
-  roles:
-    - ansible-role-users

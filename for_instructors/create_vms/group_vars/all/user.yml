@@ -10,5 +10,4 @@ adminusers:
 admin_list_of_groups:
   - { name: ansibleusers, gid: 27001 }
 
-
 ...

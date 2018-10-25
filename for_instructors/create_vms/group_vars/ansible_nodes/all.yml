@@ -1,1 +1,4 @@
 admingroup: "ansibleusers"
+moreusers:
+  - {name: ansibleworkshop, state: 'present', group: "{{admingroup}}", groups: "ansibleworkshop", shell: "{{adminshell}}" }
+
