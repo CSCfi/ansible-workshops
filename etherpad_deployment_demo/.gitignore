@@ -1,8 +1,0 @@
-*.swp
-*.swo
-*.retry
-*.idea
-my-heat-params.yml
-etherpad_inventory
-roles/ansible-role-*
-credentials/
