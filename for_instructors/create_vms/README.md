@@ -226,6 +226,7 @@ example without understanding the implications. PRs are welcome.
 ## Contributors
 
   * Johan Guldmyr - https://github.com/martbhell
+  * Risto Laurikainen - https://github.com/rlaurika
 
 ## Source
 
