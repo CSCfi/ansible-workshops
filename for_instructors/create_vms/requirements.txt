@@ -4,3 +4,4 @@ python-heatclient
 python-novaclient
 python-openstackclient
 shade
+passlib
