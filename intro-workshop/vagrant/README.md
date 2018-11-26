@@ -40,6 +40,35 @@ HostName 127.0.0.1
   Port 2222
   IdentityFile /home/josilva/workspace/ansible-workshops/intro-workshop/vagrant/.vagrant/machines/default/virtualbox/private_key
 ```
- In you particluar case, very field will in principle be the same, except the path of `IdentityFile`.
- 
+ In you particular case, every field will in principle be the same, except the path of `IdentityFile`.
+
  ## Telling Ansible about your Vagrant test server
+
+ Ansible can only manage the servers it explicitly knows about, hence you need to declare them in an inventory file.
+
+ Each server needs a name. You can use the hostname of the server, or give it an alias and pass some additional arguments to to tell Ansible how to connect to it.
+
+ For example, create a file called <i>hosts</i> under a <i>playbooks</i> directory (this will serve for now as the inventory file) and add the following entry in one single line (notice the line breaks, don't include them in your file):
+
+```
+testserver ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 \
+  ansible_ssh_user=vagrant \
+  ansible_ssh_private_key_file/Users/joao/workspace/ansible-workshops/intro-workshop/vagrant/.vagrant/machines/default/virtualbox/private_key
+```
+
+Then let's call the `ansible` command to test the connection from Ansible to the Vagrant testserver:
+```
+
+$ ansible testserver -i hosts -m ping
+[WARNING]: Unable to parse /Users/joao/workspace/ansible-workshops/intro-workshop/vagrant/hosts as an inventory source
+```
+If all goes well, you should get an output like this:
+```
+joao@Joaos-MBP:~/workspace/ansible-workshops/intro-workshop/vagrant$ ansible testserver -i playbooks/hosts -m ping
+testserver | SUCCESS => {
+   "changed": false,
+   "ping": "pong"
+}
+```
+
+## Vagrant and ansible.cfg
