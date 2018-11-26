@@ -63,7 +63,6 @@ joao@Joaos-MBP:~/workspace/ansible-workshops/intro-workshop/vagrant$ ansible tes
 ```
 If all goes well, you should get an output like this:
 ```
-joao@Joaos-MBP:~/workspace/ansible-workshops/intro-workshop/vagrant$ ansible testserver -i playbooks/hosts -m ping
 testserver | SUCCESS => {
    "changed": false,
    "ping": "pong"
