@@ -58,9 +58,8 @@ testserver ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 \
 
 Then let's call the `ansible` command to test the connection from Ansible to the Vagrant testserver:
 ```
+joao@Joaos-MBP:~/workspace/ansible-workshops/intro-workshop/vagrant$ ansible testserver -i playbooks/hosts -m ping
 
-$ ansible testserver -i hosts -m ping
-[WARNING]: Unable to parse /Users/joao/workspace/ansible-workshops/intro-workshop/vagrant/hosts as an inventory source
 ```
 If all goes well, you should get an output like this:
 ```
