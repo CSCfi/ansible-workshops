@@ -156,3 +156,4 @@ testserver | SUCCESS | rc=0 >>
  Nov 27 10:42:13 localhost ansible-command: Invoked with warn=True executable=None _uses_shell=False _raw_params=tail /var/log/messages removes=None creates=None chdir=None stdin=None
 
 ```
+If this works, now we can scale up to running a playbook. How would you deploy an Apache playbook on a Vagrant machine? :-)
