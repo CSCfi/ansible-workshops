@@ -102,3 +102,57 @@ With *remote_user* and *private_key_file* we can even simplify our Ansible inven
 ```
 testserver ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222
 ```
+
+Whose accessibility we can test with a few commands:
+
+```
+~/ansible-workshops/intro-workshop/vagrant/playbooks$ ansible testserver -m ping
+[DEPRECATION WARNING]: [defaults]hostfile option, The key is misleading as it can also be a list of hosts, a directory or a list of paths , use [defaults] inventory=/path/to/file|dir instead. This
+feature will be removed in version 2.8. Deprecation warnings can be disabled by setting deprecation_warnings=False in ansible.cfg.
+testserver | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+
+
+~/workspace/ansible-workshops/intro-workshop/vagrant/playbooks$ ansible testserver -a uptime
+[DEPRECATION WARNING]: [defaults]hostfile option, The key is misleading as it can also be a list of hosts, a directory or a list of paths , use [defaults] inventory=/path/to/file|dir instead. This
+feature will be removed in version 2.8. Deprecation warnings can be disabled by setting deprecation_warnings=False in ansible.cfg.
+testserver | SUCCESS | rc=0 >>
+ 10:41:14 up  4:54,  1 user,  load average: 0.00, 0.01, 0.05
+
+
+ ~/workspace/ansible-workshops/intro-workshop/vagrant/playbooks$ ansible testserver -a "tail /var/log/dmesg"
+ [DEPRECATION WARNING]: [defaults]hostfile option, The key is misleading as it can also be a list of hosts, a directory or a list of paths , use [defaults] inventory=/path/to/file|dir instead. This
+ feature will be removed in version 2.8. Deprecation warnings can be disabled by setting deprecation_warnings=False in ansible.cfg.
+ testserver | SUCCESS | rc=0 >>
+ [    2.109063] RPC: Registered tcp NFSv4.1 backchannel transport module.
+ [    2.407574] random: crng init done
+ [    2.498185] ACPI: Video Device [GFX0] (multi-head: yes  rom: no  post: no)
+ [    2.505287] input: Video Bus as /devices/LNXSYSTM:00/device:00/PNP0A03:00/LNXVIDEO:00/input/input4
+ [    2.594221] input: PC Speaker as /devices/platform/pcspkr/input/input5
+ [    2.597606] piix4_smbus 0000:00:07.0: SMBus Host Controller at 0x4100, revision 0
+ [    2.622759] e1000: Intel(R) PRO/1000 Network Driver - version 7.3.21-k8-NAPI
+ [    2.623674] e1000: Copyright (c) 1999-2006 Intel Corporation.
+ [    2.629690] cryptd: max_cpu_qlen set to 100
+ [    2.640313] sd 0:0:0:0: Attached scsi generic sg0 type 0
+
+
+ ~/workspace/ansible-workshops/intro-workshop/vagrant/playbooks$ ansible testserver -s -a "tail /var/log/messages"
+ [DEPRECATION WARNING]: [defaults]hostfile option, The key is misleading as it can also be a list of hosts, a directory or a list of paths , use [defaults] inventory=/path/to/file|dir instead. This
+ feature will be removed in version 2.8. Deprecation warnings can be disabled by setting deprecation_warnings=False in ansible.cfg.
+ [DEPRECATION WARNING]: The sudo command line option has been deprecated in favor of the "become" command line arguments. This feature will be removed in version 2.6. Deprecation warnings can be
+ disabled by setting deprecation_warnings=False in ansible.cfg.
+ testserver | SUCCESS | rc=0 >>
+ Nov 27 10:41:13 localhost systemd: Stopping User Slice of vagrant.
+ Nov 27 10:41:14 localhost systemd: Created slice User Slice of vagrant.
+ Nov 27 10:41:14 localhost systemd: Starting User Slice of vagrant.
+ Nov 27 10:41:14 localhost systemd: Started Session 15 of user vagrant.
+ Nov 27 10:41:14 localhost systemd-logind: New session 15 of user vagrant.
+ Nov 27 10:41:14 localhost systemd: Starting Session 15 of user vagrant.
+ Nov 27 10:41:14 localhost ansible-command: Invoked with warn=True executable=None _uses_shell=False _raw_params=uptime removes=None creates=None chdir=None stdin=None
+ Nov 27 10:41:46 localhost ansible-command: Invoked with warn=True executable=None _uses_shell=False _raw_params=tail /var/log/dmesg removes=None creates=None chdir=None stdin=None
+ Nov 27 10:41:55 localhost ansible-command: Invoked with warn=True executable=None _uses_shell=False _raw_params=tail /var/log/dmesg removes=None creates=None chdir=None stdin=None
+ Nov 27 10:42:13 localhost ansible-command: Invoked with warn=True executable=None _uses_shell=False _raw_params=tail /var/log/messages removes=None creates=None chdir=None stdin=None
+
+```
