@@ -89,8 +89,16 @@ Example of such an *ansible.cfg* for usage with Vagrant:
 [defaults]
 hostfile = hosts
 remote_user = vagrant
-private_key_file = .vagrant/machines/default/virtualbox/private_key
+private_key_file = ../vagrant/machines/default/virtualbox/private_key
 host_key_checking = False
 ```
 
-In this example *ansible.cfg* file, you can see the specification of the location of the *inventory* file (*hostfile*), the user to SSH to the Vagrant machine (*remote_user*), and the respective SSH private key (*private_key_file*)
+In this example *ansible.cfg* file, you can see the specification of the location of the *inventory* file (*hostfile*), the user to SSH to the Vagrant machine (*remote_user*), and the respective SSH private key (*private_key_file*).
+
+Notice that SSH key checking (*host_key_checking*) is disabled. This is very handy when working with Vagrant machines, which can be created and destroyed often, otherwise we'd have to edit *~./ssh/known_hosts* all the time. Evidently, this can be a security risk when connecting to other servers over a network.
+
+With *remote_user* and *private_key_file* we can even simplify our Ansible inventory *hosts* file:
+
+```
+testserver ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222
+```
