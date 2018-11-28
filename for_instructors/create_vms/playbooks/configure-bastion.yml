@@ -1,12 +1,14 @@
 ---
 - hosts: bastion
   gather_facts: yes
+  tags: init
   user: cloud-user
 
 - name: initial setup of bastion host
   hosts: bastion
   become: yes
   user: cloud-user
+  tags: init
   vars:
     - python_packages_to_install:
        - python-pip
@@ -29,13 +31,14 @@
         src: motd.j2
         dest: /etc/profile.d/workshop-motd.sh
         mode: 0644
+      tags: motd
     - name: install python-pip and python36
       package:
         name: "{{ python_packages_to_install }}"
         state: present
 
   roles:
-    - ansible-role-users
+    - { name: ansible-role-users, tags: bastionusers }
     - { name: ansible-role-sshd, tags: sshd, ssh }
 
 - name: create some users on the ansible_nodes
@@ -58,6 +61,7 @@
         mode: 0700
         owner: ansibleworkshop
         group: ansibleworkshop
+      tags: users
 
 - name: still some manual bash for loops to do - see README
   hosts: bastion
