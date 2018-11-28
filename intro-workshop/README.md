@@ -36,7 +36,7 @@ And why not continuing the Apache thread by a ops_playbook to for example update
 http://docs.ansible.com/
 
 ## Getting Started with the Exercises
-0. Installing ansible after sshing in to the bastion host
+0. Installing ansible after sshing in to the bastion host (alternatively you could also set up Vagrant + Virtualbox)[https://github.com/CSCfi/ansible-workshops/blob/master/intro-workshop/vagrant/README.md]
 
 1. apache2: this is the simplest exercise, the inventory is in one playbook (`apache2.yml.`). Give a value to `hosts` (replace `<your_remote_host>` with the remote host's IP) and get it running with `ansible-playbook apache2.yml`.
 
